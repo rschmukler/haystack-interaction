@@ -4,6 +4,47 @@ An reproduction of the odd haystack interaction that can happen when using custo
 
 Note that you need OpenJDK 19 to test the issue.
 
+## Final Conclusion
+
+So, after a day of debugging it looks like this is most likely an issue with
+Loom more than anything. Calling `set-agent-send-off-executor!` will cause
+`pmap` to use that executor. Deeply nested spawning of threads seems to lock up loom easily (ie.
+a few level of pmap nesting). Below is a code snippet that can be used to see it:
+
+
+```clojure
+(defn ppmap
+  [f coll]
+  (->> coll
+       (mapv
+         (fn [x]
+           (let [cf (java.util.concurrent.CompletableFuture.)]
+             (Thread/startVirtualThread
+               (bound-fn []
+                 (try
+                   (.complete cf (f x))
+                   (catch Exception e
+                     (.completeExceptionally cf e)))))
+             cf)))
+       (map deref)))
+
+(let [n 4]
+   (->> (range n)
+        (ppmap
+          (fn [_]
+            (->> (range n)
+                 (ppmap (fn [_]
+                          (->> (range n)
+                               (ppmap (fn [_]
+                                        (ppmap identity (range n))))
+                               (apply concat)
+                               (into #{}))))
+                 (apply concat)
+                 (into #{}))))
+        (apply concat)
+        (into #{})))
+```
+
 
 ## Instructions
 
