@@ -1,0 +1,5 @@
+{:paths ["src"]
+ :aliases
+ {:repro
+  {:jvm-opts
+   ["--enable-preview"]}}}
