@@ -2,6 +2,8 @@
 
 An reproduction of the odd haystack interaction that can happen when using custom executors.
 
+Note that you need OpenJDK 19 to test the issue.
+
 
 ## Instructions
 
