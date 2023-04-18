@@ -26,4 +26,5 @@ After a lot of debugging, I have narrowed it down to an interaction between `del
 
 This interaction can be seen with [the use of pmap inside analyze-stacktrace-data](https://github.com/clojure-emacs/haystack/blob/master/src/haystack/analyzer.clj#L319) and the delay used by [ns-common-prefix](https://github.com/clojure-emacs/haystack/blob/master/src/haystack/analyzer.clj#L188) in haystack.
 
-I suspect it might be some weird interaction with haystack being an inlined dependency.
+~~I suspect it might be some weird interaction with haystack being an inlined dependency.~~ Edit:
+I tried switching haystack to not be an inlined dependency and the issue was still hit, so it doesn't matter whether it's inlined or not.
